@@ -1,0 +1,266 @@
+:root {
+  --text: #3a2e4f;
+  --muted: #8a7fa3;
+  --card: #ffffff;
+  --accent: #7c5cff;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: var(--text);
+  font-family: "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(160deg, #ffe29a 0%, #ffa6c9 35%, #a6c8ff 70%, #b8a6ff 100%);
+  background-attachment: fixed;
+}
+
+#app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top, 0) 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ===== Titel ===== */
+header h1 {
+  text-align: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 16px 0 2px;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(124, 92, 255, 0.35), 0 6px 10px rgba(0,0,0,0.15);
+}
+.title-emoji {
+  display: inline-block;
+  animation: wiggle 2.5s ease-in-out infinite;
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* ===== Live-Anzeige ===== */
+.display {
+  background: var(--card);
+  border-radius: 32px;
+  padding: 22px 22px 26px;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(90, 60, 160, 0.25);
+  border: 4px solid #fff;
+}
+
+.face {
+  font-size: 5.5rem;
+  line-height: 1;
+  margin-bottom: 6px;
+  transition: transform 0.15s ease;
+}
+
+.db-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.db-value {
+  font-size: 5.2rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #45c46a;
+  transition: color 0.15s ease;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.08);
+}
+.db-unit {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.stufe {
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin-top: 6px;
+  min-height: 1.5em;
+  transition: color 0.15s ease;
+  color: #45c46a;
+}
+
+.bar-track {
+  position: relative;
+  height: 20px;
+  background: #efeaf7;
+  border-radius: 14px;
+  margin-top: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(90,60,160,0.12);
+}
+.bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  border-radius: 14px;
+  background: #45c46a;
+  transition: width 0.12s linear, background 0.15s ease;
+}
+.threshold-mark {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 5px;
+  background: #3a2e4f;
+  border-radius: 4px;
+  left: 60%;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* ===== Start/Stop ===== */
+.controls { text-align: center; }
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 22px;
+  padding: 16px 22px;
+  cursor: pointer;
+  color: #fff;
+  background: #b8a6ff;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.12);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+}
+
+.btn-primary {
+  font-size: 1.6rem;
+  font-weight: 700;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+.btn-primary.running {
+  background: #ff5d6c !important;
+  color: #fff !important;
+}
+
+.btn-small {
+  font-size: 1rem;
+  padding: 12px 18px;
+  background: var(--accent);
+}
+
+.status {
+  margin-top: 10px;
+  color: #6b4ea0;
+  font-size: 0.95rem;
+  min-height: 1.2em;
+  font-weight: 500;
+}
+.status.error { color: #d6344a; }
+
+/* ===== Einstellungen ===== */
+.settings {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 8px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 12px 28px rgba(90, 60, 160, 0.2);
+  border: 4px solid #fff;
+}
+
+.setting { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.setting > label { font-weight: 600; font-size: 1.05rem; }
+
+.threshold-row { display: flex; align-items: center; gap: 14px; }
+.threshold-row input[type="range"] { flex: 1; }
+.threshold-label {
+  min-width: 130px;
+  text-align: right;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 12px;
+  border-radius: 8px;
+  background: #efeaf7;
+  outline: none;
+  touch-action: none; /* damit der Regler am Handy gezogen werden kann */
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 4px solid #fff;
+  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 32px; height: 32px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  cursor: pointer;
+}
+
+.sound-row { display: flex; gap: 10px; }
+.sound-row select { flex: 1; }
+
+select {
+  font: inherit;
+  font-weight: 500;
+  background: #efeaf7;
+  color: var(--text);
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.custom-sound { display: none; flex-direction: column; gap: 6px; }
+.custom-sound.show { display: flex; }
+.custom-sound input[type="file"] { color: var(--muted); font-size: 0.9rem; }
+
+.advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.05rem;
+  list-style: none;
+}
+.advanced summary::before { content: "🎚️ "; }
+.advanced input[type="range"] { width: 100%; margin-top: 6px; }
+
+.checkbox-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; font-weight: 500; cursor: pointer;
+}
+.checkbox-row input { width: 24px; height: 24px; accent-color: var(--accent); }
+
+.hint { color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
+
+footer { text-align: center; }
+footer .hint { color: #6b4ea0; }
+
+/* ===== Alarm-Zustand: alles wackelt ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-6px) rotate(-3deg); }
+  40% { transform: translateX(6px) rotate(3deg); }
+  60% { transform: translateX(-5px) rotate(-2deg); }
+  80% { transform: translateX(5px) rotate(2deg); }
+}
+.display.alarm { animation: shake 0.4s ease-in-out infinite; }
+.display.alarm .face { animation: shake 0.25s ease-in-out infinite; }

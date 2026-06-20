@@ -1,0 +1,21 @@
+{
+  "name": "krachalarm",
+  "version": "1.0.0",
+  "description": "Krach Alarm – misst Außengeräusche und schlägt bei kritischem Pegel Alarm.",
+  "private": true,
+  "scripts": {
+    "serve": "npx --yes serve www",
+    "standalone": "node build-standalone.js",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android",
+    "apk": "cd android && ./gradlew assembleDebug"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "appId": "de.krachalarm.app",
+  "appName": "Krach Alarm",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  }
+}

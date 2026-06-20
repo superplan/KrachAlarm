@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffb3d1" />
+  <title>Krach Alarm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --text: #3a2e4f;
+  --muted: #8a7fa3;
+  --card: #ffffff;
+  --accent: #7c5cff;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: var(--text);
+  font-family: "Fredoka", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(160deg, #ffe29a 0%, #ffa6c9 35%, #a6c8ff 70%, #b8a6ff 100%);
+  background-attachment: fixed;
+}
+
+#app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top, 0) 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ===== Titel ===== */
+header h1 {
+  text-align: center;
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 16px 0 2px;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(124, 92, 255, 0.35), 0 6px 10px rgba(0,0,0,0.15);
+}
+.title-emoji {
+  display: inline-block;
+  animation: wiggle 2.5s ease-in-out infinite;
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* ===== Live-Anzeige ===== */
+.display {
+  background: var(--card);
+  border-radius: 32px;
+  padding: 22px 22px 26px;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(90, 60, 160, 0.25);
+  border: 4px solid #fff;
+}
+
+.face {
+  font-size: 5.5rem;
+  line-height: 1;
+  margin-bottom: 6px;
+  transition: transform 0.15s ease;
+}
+
+.db-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.db-value {
+  font-size: 5.2rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #45c46a;
+  transition: color 0.15s ease;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.08);
+}
+.db-unit {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.stufe {
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin-top: 6px;
+  min-height: 1.5em;
+  transition: color 0.15s ease;
+  color: #45c46a;
+}
+
+.bar-track {
+  position: relative;
+  height: 20px;
+  background: #efeaf7;
+  border-radius: 14px;
+  margin-top: 18px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(90,60,160,0.12);
+}
+.bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  border-radius: 14px;
+  background: #45c46a;
+  transition: width 0.12s linear, background 0.15s ease;
+}
+.threshold-mark {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 5px;
+  background: #3a2e4f;
+  border-radius: 4px;
+  left: 60%;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* ===== Start/Stop ===== */
+.controls { text-align: center; }
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 22px;
+  padding: 16px 22px;
+  cursor: pointer;
+  color: #fff;
+  background: #b8a6ff;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.12);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+}
+
+.btn-primary {
+  font-size: 1.6rem;
+  font-weight: 700;
+  width: 100%;
+  letter-spacing: 0.5px;
+}
+.btn-primary.running {
+  background: #ff5d6c !important;
+  color: #fff !important;
+}
+
+.btn-small {
+  font-size: 1rem;
+  padding: 12px 18px;
+  background: var(--accent);
+}
+
+.status {
+  margin-top: 10px;
+  color: #6b4ea0;
+  font-size: 0.95rem;
+  min-height: 1.2em;
+  font-weight: 500;
+}
+.status.error { color: #d6344a; }
+
+/* ===== Einstellungen ===== */
+.settings {
+  background: var(--card);
+  border-radius: 28px;
+  padding: 8px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 12px 28px rgba(90, 60, 160, 0.2);
+  border: 4px solid #fff;
+}
+
+.setting { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.setting > label { font-weight: 600; font-size: 1.05rem; }
+
+.threshold-row { display: flex; align-items: center; gap: 14px; }
+.threshold-row input[type="range"] { flex: 1; }
+.threshold-label {
+  min-width: 130px;
+  text-align: right;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 12px;
+  border-radius: 8px;
+  background: #efeaf7;
+  outline: none;
+  touch-action: none; /* damit der Regler am Handy gezogen werden kann */
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 4px solid #fff;
+  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 32px; height: 32px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  cursor: pointer;
+}
+
+.sound-row { display: flex; gap: 10px; }
+.sound-row select { flex: 1; }
+
+select {
+  font: inherit;
+  font-weight: 500;
+  background: #efeaf7;
+  color: var(--text);
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.custom-sound { display: none; flex-direction: column; gap: 6px; }
+.custom-sound.show { display: flex; }
+.custom-sound input[type="file"] { color: var(--muted); font-size: 0.9rem; }
+
+.advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.05rem;
+  list-style: none;
+}
+.advanced summary::before { content: "🎚️ "; }
+.advanced input[type="range"] { width: 100%; margin-top: 6px; }
+
+.checkbox-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; font-weight: 500; cursor: pointer;
+}
+.checkbox-row input { width: 24px; height: 24px; accent-color: var(--accent); }
+
+.hint { color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
+
+footer { text-align: center; }
+footer .hint { color: #6b4ea0; }
+
+/* ===== Alarm-Zustand: alles wackelt ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-6px) rotate(-3deg); }
+  40% { transform: translateX(6px) rotate(3deg); }
+  60% { transform: translateX(-5px) rotate(-2deg); }
+  80% { transform: translateX(5px) rotate(2deg); }
+}
+.display.alarm { animation: shake 0.4s ease-in-out infinite; }
+.display.alarm .face { animation: shake 0.25s ease-in-out infinite; }
+
+</style>
+</head>
+<body>
+  <main id="app">
+    <header>
+      <h1><span class="title-emoji">🔊</span> Krach&nbsp;Alarm</h1>
+    </header>
+
+    <!-- Live-Anzeige -->
+    <section class="display" aria-live="polite">
+      <div id="face" class="face">👂</div>
+      <div class="db-row">
+        <span id="dbValue" class="db-value">--</span>
+        <span class="db-unit">dB</span>
+      </div>
+      <div id="stufe" class="stufe">Bereit?</div>
+      <div class="bar-track">
+        <div id="bar" class="bar-fill"></div>
+        <div id="thresholdMark" class="threshold-mark" title="Grenzwert"></div>
+      </div>
+    </section>
+
+    <!-- Start / Stop -->
+    <section class="controls">
+      <button id="toggleBtn" class="btn btn-primary">Los</button>
+      <div id="status" class="status"></div>
+    </section>
+
+    <!-- Einstellungen -->
+    <section class="settings">
+      <div class="setting">
+        <label for="threshold">Grenzwert (Alarm ab)</label>
+        <div class="threshold-row">
+          <input type="range" id="threshold" min="20" max="130" step="10" value="80" />
+          <span id="thresholdLabel" class="threshold-label"></span>
+        </div>
+      </div>
+
+      <div class="setting">
+        <label for="sound">Alarm-Sound</label>
+        <div class="sound-row">
+          <select id="sound">
+            <option value="beep">Piepton</option>
+            <option value="alarm">Alarm (Zweiton)</option>
+            <option value="sirene">Sirene</option>
+            <option value="custom">Eigener Sound</option>
+          </select>
+          <button id="testBtn" class="btn btn-small">Test</button>
+        </div>
+        <div class="custom-sound">
+          <input type="file" id="soundFile" accept="audio/*" />
+          <span id="soundFileName" class="hint"></span>
+        </div>
+      </div>
+
+      <details class="setting advanced">
+        <summary>Kalibrierung (genauere dB-Werte)</summary>
+        <label for="calibration">Korrektur-Offset: <span id="calibrationLabel"></span> dB</label>
+        <input type="range" id="calibration" min="40" max="140" step="1" value="100" />
+        <p class="hint">
+          Die dB-Werte sind eine Schätzung. Vergleiche mit einer geeichten
+          Schallpegel-App und schiebe den Offset, bis die Werte passen.
+        </p>
+      </details>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="keepAwake" checked />
+        Bildschirm während der Messung anlassen
+      </label>
+      <p class="hint">
+        Ohne Häkchen pausiert die Messung, sobald der Bildschirm schläft,
+        und läuft beim Aufwecken weiter. Messen mit ausgeschaltetem
+        Bildschirm ist in einer Web-App leider nicht möglich.
+      </p>
+    </section>
+  </main>
+
+  <script>
+"use strict";
+
+/* ====== Stufen-Tabelle (dB -> Bezeichnung) ====== */
+const STUFEN = [
+  { db: 20, label: "Blätterrascheln" },
+  { db: 30, label: "leises Flüstern" },
+  { db: 40, label: "leiser Regen" },
+  { db: 50, label: "leises Gespräch" },
+  { db: 60, label: "normales Gespräch" },
+  { db: 70, label: "lautes Gespräch" },
+  { db: 80, label: "Föhn" },
+  { db: 90, label: "Rasenmäher" },
+  { db: 100, label: "Kreissäge" },
+  { db: 110, label: "Sirene nah" },
+  { db: 120, label: "Schmerzgrenze" },
+  { db: 130, label: "Düsenjet" },
+];
+
+/* ====== Einstellungen speichern/laden ====== */
+const STORE_KEY = "krachalarm.settings.v1";
+const settings = Object.assign(
+  {
+    threshold: 80,
+    sound: "beep",
+    calibration: 100,
+    keepAwake: true,
+    customSound: null, // data-URL des eigenen Sounds
+    customName: "",
+  },
+  loadSettings()
+);
+
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveSettings() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(settings));
+  } catch (e) {
+    /* z.B. Speicher voll bei großem Sound – ignorieren */
+  }
+}
+
+/* ====== Farbe je nach dB: grün -> rot -> lila ====== */
+function dbColor(db) {
+  db = Math.max(0, Math.min(130, db));
+  let hue;
+  if (db <= 50) {
+    hue = 120; // grün
+  } else if (db <= 120) {
+    hue = 120 * (1 - (db - 50) / 70); // 120 (grün) -> 0 (rot)
+  } else {
+    hue = 360 - 80 * (db - 120) / 10; // 360 (rot) -> 280 (lila)
+  }
+  return `hsl(${hue.toFixed(0)}, 85%, 55%)`;
+}
+
+/* ====== Smiley je nach Lautstärke ====== */
+function faceFor(db) {
+  if (db < 30) return "😴";
+  if (db < 45) return "🙂";
+  if (db < 60) return "😄";
+  if (db < 75) return "😯";
+  if (db < 90) return "😧";
+  if (db < 105) return "😣";
+  if (db < 120) return "🤯";
+  return "😱";
+}
+
+/* ====== Stufen-Text je nach dB ====== */
+function stufeLabel(db) {
+  let label = "Stille";
+  for (const s of STUFEN) {
+    if (db >= s.db) label = s.label;
+  }
+  return label;
+}
+
+/* ====== Laufzeit-Status ====== */
+let running = false;
+
+/* ====== DOM-Referenzen ====== */
+const el = {
+  face: document.getElementById("face"),
+  dbValue: document.getElementById("dbValue"),
+  stufe: document.getElementById("stufe"),
+  bar: document.getElementById("bar"),
+  thresholdMark: document.getElementById("thresholdMark"),
+  display: document.querySelector(".display"),
+  toggleBtn: document.getElementById("toggleBtn"),
+  status: document.getElementById("status"),
+  threshold: document.getElementById("threshold"),
+  thresholdLabel: document.getElementById("thresholdLabel"),
+  sound: document.getElementById("sound"),
+  testBtn: document.getElementById("testBtn"),
+  soundFile: document.getElementById("soundFile"),
+  soundFileName: document.getElementById("soundFileName"),
+  customWrap: document.querySelector(".custom-sound"),
+  calibration: document.getElementById("calibration"),
+  calibrationLabel: document.getElementById("calibrationLabel"),
+  keepAwake: document.getElementById("keepAwake"),
+};
+
+/* ====== UI initialisieren ====== */
+el.threshold.value = settings.threshold;
+el.sound.value = settings.sound;
+el.calibration.value = settings.calibration;
+el.keepAwake.checked = settings.keepAwake;
+el.soundFileName.textContent = settings.customName || "";
+updateThresholdUI();
+updateCalibrationUI();
+updateCustomVisibility();
+
+function updateThresholdUI() {
+  const v = Number(el.threshold.value);
+  el.thresholdLabel.textContent = `${v} dB · ${stufeLabel(v)}`;
+  el.thresholdMark.style.left = `${(v / 130) * 100}%`;
+  updateToggleButton();
+}
+
+// Button-Text + Farbe je nach Zustand und Grenzwert
+function updateToggleButton() {
+  if (running) {
+    el.toggleBtn.textContent = "Stopp";
+    el.toggleBtn.style.background = ""; // rote Farbe via .running-Klasse
+    el.toggleBtn.style.color = "";
+  } else {
+    el.toggleBtn.textContent = "Los";
+    el.toggleBtn.style.background = dbColor(settings.threshold);
+    el.toggleBtn.style.color = "#0c0f13";
+  }
+}
+function updateCalibrationUI() {
+  el.calibrationLabel.textContent = el.calibration.value;
+}
+function updateCustomVisibility() {
+  el.customWrap.classList.toggle("show", el.sound.value === "custom");
+}
+
+/* ====== Einstellungs-Events ====== */
+el.threshold.addEventListener("input", () => {
+  settings.threshold = Number(el.threshold.value);
+  updateThresholdUI();
+  saveSettings();
+});
+el.sound.addEventListener("change", () => {
+  settings.sound = el.sound.value;
+  updateCustomVisibility();
+  saveSettings();
+});
+el.calibration.addEventListener("input", () => {
+  settings.calibration = Number(el.calibration.value);
+  updateCalibrationUI();
+  saveSettings();
+});
+el.keepAwake.addEventListener("change", () => {
+  settings.keepAwake = el.keepAwake.checked;
+  saveSettings();
+  if (!settings.keepAwake) releaseWakeLock();
+  else if (running) requestWakeLock();
+});
+
+el.soundFile.addEventListener("change", () => {
+  const file = el.soundFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    settings.customSound = reader.result;
+    settings.customName = file.name;
+    el.soundFileName.textContent = file.name;
+    saveSettings();
+  };
+  reader.readAsDataURL(file);
+});
+
+el.testBtn.addEventListener("click", async () => {
+  await ensureAudioContext();
+  alarmPlayer.start(el.sound.value);
+  setTimeout(() => alarmPlayer.stop(), 1500);
+});
+
+/* ====== Audio: Messung ====== */
+let audioCtx = null;
+let analyser = null;
+let micStream = null;
+let dataArray = null;
+let rafId = null;
+let smoothedDb = 0;
+let lastUiUpdate = 0;
+
+async function ensureAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+}
+
+async function startMeasuring() {
+  setStatus("");
+  try {
+    await ensureAudioContext();
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    });
+  } catch (e) {
+    setStatus("Mikrofon-Zugriff verweigert oder nicht verfügbar.", true);
+    return;
+  }
+
+  const source = audioCtx.createMediaStreamSource(micStream);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  dataArray = new Float32Array(analyser.fftSize);
+  source.connect(analyser);
+
+  running = true;
+  el.toggleBtn.classList.add("running");
+  updateToggleButton();
+  if (settings.keepAwake) requestWakeLock();
+  loop();
+}
+
+function stopMeasuring() {
+  running = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  if (micStream) micStream.getTracks().forEach((t) => t.stop());
+  micStream = null;
+  analyser = null;
+  alarmPlayer.stop();
+  el.display.classList.remove("alarm");
+  el.toggleBtn.classList.remove("running");
+  updateToggleButton();
+  el.dbValue.textContent = "--";
+  el.dbValue.style.color = "";
+  el.face.textContent = "👂";
+  el.stufe.textContent = "Bereit?";
+  el.stufe.style.color = "";
+  el.bar.style.width = "0%";
+  releaseWakeLock();
+}
+
+function loop() {
+  if (!running) return;
+  rafId = requestAnimationFrame(loop);
+
+  analyser.getFloatTimeDomainData(dataArray);
+  // RMS berechnen
+  let sum = 0;
+  for (let i = 0; i < dataArray.length; i++) {
+    sum += dataArray[i] * dataArray[i];
+  }
+  const rms = Math.sqrt(sum / dataArray.length);
+  // dBFS (negativ) + Kalibrier-Offset -> geschätzte dB(SPL)
+  const dbfs = 20 * Math.log10(rms || 1e-7);
+  let db = dbfs + settings.calibration;
+  db = Math.max(0, Math.min(130, db));
+
+  // Glätten (exponentieller gleitender Mittelwert)
+  smoothedDb = smoothedDb * 0.8 + db * 0.2;
+
+  const now = performance.now();
+  if (now - lastUiUpdate > 80) {
+    lastUiUpdate = now;
+    updateDisplay(smoothedDb);
+  }
+
+  checkAlarm(smoothedDb);
+}
+
+function updateDisplay(db) {
+  const rounded = Math.round(db);
+  const color = dbColor(db);
+  el.dbValue.textContent = rounded;
+  el.dbValue.style.color = color;
+  el.face.textContent = faceFor(db);
+  el.stufe.textContent = stufeLabel(db);
+  el.stufe.style.color = color;
+  el.bar.style.width = `${(db / 130) * 100}%`;
+  el.bar.style.background = color;
+}
+
+/* ====== Alarm-Logik mit Hysterese ====== */
+let alarmActive = false;
+function checkAlarm(db) {
+  const on = settings.threshold;
+  const off = settings.threshold - 3; // Hysterese, damit es nicht flattert
+  if (!alarmActive && db >= on) {
+    alarmActive = true;
+    alarmPlayer.start(settings.sound);
+    el.display.classList.add("alarm");
+  } else if (alarmActive && db < off) {
+    alarmActive = false;
+    alarmPlayer.stop();
+    el.display.classList.remove("alarm");
+  }
+}
+
+/* ====== Alarm-Player (synthetisiert + eigener Sound) ====== */
+const alarmPlayer = {
+  nodes: [],
+  interval: null,
+  audioEl: null,
+  playing: false,
+
+  start(type) {
+    if (this.playing) return;
+    this.playing = true;
+    ensureAudioContext();
+
+    if (type === "custom") {
+      this._playCustom();
+    } else if (type === "beep") {
+      this._beepLoop(880, 0.18, 0.32);
+    } else if (type === "alarm") {
+      this._twoTone();
+    } else if (type === "sirene") {
+      this._siren();
+    }
+  },
+
+  stop() {
+    this.playing = false;
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+    this.nodes.forEach((n) => {
+      try {
+        n.stop ? n.stop() : n.disconnect();
+      } catch (e) {}
+    });
+    this.nodes = [];
+    if (this.audioEl) {
+      this.audioEl.pause();
+      this.audioEl.currentTime = 0;
+      this.audioEl = null;
+    }
+  },
+
+  _tone(freq, duration) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "square";
+    osc.frequency.value = freq;
+    gain.gain.value = 0.0001;
+    osc.connect(gain).connect(audioCtx.destination);
+    const t = audioCtx.currentTime;
+    gain.gain.exponentialRampToValueAtTime(0.4, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.start(t);
+    osc.stop(t + duration + 0.02);
+  },
+
+  _beepLoop(freq, dur, gap) {
+    this._tone(freq, dur);
+    this.interval = setInterval(() => {
+      if (this.playing) this._tone(freq, dur);
+    }, (dur + gap) * 1000);
+  },
+
+  _twoTone() {
+    let high = true;
+    const fire = () => {
+      if (!this.playing) return;
+      this._tone(high ? 750 : 600, 0.3);
+      high = !high;
+    };
+    fire();
+    this.interval = setInterval(fire, 350);
+  },
+
+  _siren() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sawtooth";
+    gain.gain.value = 0.3;
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    this.nodes.push(osc, gain);
+
+    let dir = 1;
+    let freq = 500;
+    osc.frequency.value = freq;
+    this.interval = setInterval(() => {
+      if (!this.playing) return;
+      freq += dir * 40;
+      if (freq >= 1100) dir = -1;
+      if (freq <= 500) dir = 1;
+      osc.frequency.linearRampToValueAtTime(
+        freq,
+        audioCtx.currentTime + 0.05
+      );
+    }, 50);
+  },
+
+  _playCustom() {
+    const src = settings.customSound;
+    if (!src) {
+      // Fallback: Datei aus dem Ordner sounds/ versuchen, sonst Piep
+      this.audioEl = new Audio("sounds/alarm.mp3");
+      this.audioEl.loop = true;
+      this.audioEl.play().catch(() => {
+        this.audioEl = null;
+        this._beepLoop(880, 0.18, 0.32);
+      });
+      return;
+    }
+    this.audioEl = new Audio(src);
+    this.audioEl.loop = true;
+    this.audioEl.play().catch(() => {
+      this.audioEl = null;
+      this._beepLoop(880, 0.18, 0.32);
+    });
+  },
+};
+
+/* ====== Start/Stop-Button ====== */
+el.toggleBtn.addEventListener("click", () => {
+  if (running) stopMeasuring();
+  else startMeasuring();
+});
+
+/* ====== Screen Wake Lock (Bildschirm an lassen) ====== */
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ("wakeLock" in navigator) {
+      wakeLock = await navigator.wakeLock.request("screen");
+    }
+  } catch (e) {}
+}
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release().catch(() => {});
+    wakeLock = null;
+  }
+}
+document.addEventListener("visibilitychange", () => {
+  if (running && settings.keepAwake && document.visibilityState === "visible") {
+    requestWakeLock();
+  }
+});
+
+function setStatus(msg, isError) {
+  el.status.textContent = msg;
+  el.status.classList.toggle("error", !!isError);
+}
+
+/* ====== Service Worker (für PWA-Installation/Offline) ====== */
+/* Service Worker in der Standalone-Datei nicht verfuegbar */
+
+</script>
+</body>
+</html>

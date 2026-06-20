@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffb3d1" />
+  <title>Krach Alarm</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <header>
+      <h1><span class="title-emoji">🔊</span> Krach&nbsp;Alarm</h1>
+    </header>
+
+    <!-- Live-Anzeige -->
+    <section class="display" aria-live="polite">
+      <div id="face" class="face">👂</div>
+      <div class="db-row">
+        <span id="dbValue" class="db-value">--</span>
+        <span class="db-unit">dB</span>
+      </div>
+      <div id="stufe" class="stufe">Bereit?</div>
+      <div class="bar-track">
+        <div id="bar" class="bar-fill"></div>
+        <div id="thresholdMark" class="threshold-mark" title="Grenzwert"></div>
+      </div>
+    </section>
+
+    <!-- Start / Stop -->
+    <section class="controls">
+      <button id="toggleBtn" class="btn btn-primary">Los</button>
+      <div id="status" class="status"></div>
+    </section>
+
+    <!-- Einstellungen -->
+    <section class="settings">
+      <div class="setting">
+        <label for="threshold">Grenzwert (Alarm ab)</label>
+        <div class="threshold-row">
+          <input type="range" id="threshold" min="20" max="130" step="10" value="80" />
+          <span id="thresholdLabel" class="threshold-label"></span>
+        </div>
+      </div>
+
+      <div class="setting">
+        <label for="sound">Alarm-Sound</label>
+        <div class="sound-row">
+          <select id="sound">
+            <option value="beep">Piepton</option>
+            <option value="alarm">Alarm (Zweiton)</option>
+            <option value="sirene">Sirene</option>
+            <option value="custom">Eigener Sound</option>
+          </select>
+          <button id="testBtn" class="btn btn-small">Test</button>
+        </div>
+        <div class="custom-sound">
+          <input type="file" id="soundFile" accept="audio/*" />
+          <span id="soundFileName" class="hint"></span>
+        </div>
+      </div>
+
+      <details class="setting advanced">
+        <summary>Kalibrierung (genauere dB-Werte)</summary>
+        <label for="calibration">Korrektur-Offset: <span id="calibrationLabel"></span> dB</label>
+        <input type="range" id="calibration" min="40" max="140" step="1" value="100" />
+        <p class="hint">
+          Die dB-Werte sind eine Schätzung. Vergleiche mit einer geeichten
+          Schallpegel-App und schiebe den Offset, bis die Werte passen.
+        </p>
+      </details>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="keepAwake" checked />
+        Bildschirm während der Messung anlassen
+      </label>
+      <p class="hint">
+        Ohne Häkchen pausiert die Messung, sobald der Bildschirm schläft,
+        und läuft beim Aufwecken weiter. Messen mit ausgeschaltetem
+        Bildschirm ist in einer Web-App leider nicht möglich.
+      </p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
