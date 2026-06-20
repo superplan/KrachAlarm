@@ -83,6 +83,11 @@ function stufeLabel(db) {
 /* ====== Laufzeit-Status ====== */
 let running = false;
 
+/* ====== Grenzwert-Grenzen ====== */
+const THRESHOLD_MIN = 20;
+const THRESHOLD_MAX = 130;
+const THRESHOLD_STEP = 10;
+
 /* ====== DOM-Referenzen ====== */
 const el = {
   face: document.getElementById("face"),
@@ -93,8 +98,10 @@ const el = {
   display: document.querySelector(".display"),
   toggleBtn: document.getElementById("toggleBtn"),
   status: document.getElementById("status"),
-  threshold: document.getElementById("threshold"),
-  thresholdLabel: document.getElementById("thresholdLabel"),
+  thrDown: document.getElementById("thrDown"),
+  thrUp: document.getElementById("thrUp"),
+  thresholdDb: document.getElementById("thresholdDb"),
+  thresholdName: document.getElementById("thresholdName"),
   sound: document.getElementById("sound"),
   testBtn: document.getElementById("testBtn"),
   soundFile: document.getElementById("soundFile"),
@@ -106,7 +113,6 @@ const el = {
 };
 
 /* ====== UI initialisieren ====== */
-el.threshold.value = settings.threshold;
 el.sound.value = settings.sound;
 el.calibration.value = settings.calibration;
 el.keepAwake.checked = settings.keepAwake;
@@ -115,10 +121,22 @@ updateThresholdUI();
 updateCalibrationUI();
 updateCustomVisibility();
 
+function setThreshold(v) {
+  v = Math.max(THRESHOLD_MIN, Math.min(THRESHOLD_MAX, v));
+  settings.threshold = v;
+  updateThresholdUI();
+  saveSettings();
+}
+
 function updateThresholdUI() {
-  const v = Number(el.threshold.value);
-  el.thresholdLabel.textContent = `${v} dB · ${stufeLabel(v)}`;
+  const v = settings.threshold;
+  const color = dbColor(v);
+  el.thresholdDb.textContent = v;
+  el.thresholdName.textContent = stufeLabel(v);
+  el.thresholdDb.parentElement.style.color = color;
   el.thresholdMark.style.left = `${(v / 130) * 100}%`;
+  el.thrDown.disabled = v <= THRESHOLD_MIN;
+  el.thrUp.disabled = v >= THRESHOLD_MAX;
   updateToggleButton();
 }
 
@@ -142,11 +160,12 @@ function updateCustomVisibility() {
 }
 
 /* ====== Einstellungs-Events ====== */
-el.threshold.addEventListener("input", () => {
-  settings.threshold = Number(el.threshold.value);
-  updateThresholdUI();
-  saveSettings();
-});
+el.thrDown.addEventListener("click", () =>
+  setThreshold(settings.threshold - THRESHOLD_STEP)
+);
+el.thrUp.addEventListener("click", () =>
+  setThreshold(settings.threshold + THRESHOLD_STEP)
+);
 el.sound.addEventListener("change", () => {
   settings.sound = el.sound.value;
   updateCustomVisibility();

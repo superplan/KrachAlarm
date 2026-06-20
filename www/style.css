@@ -179,14 +179,58 @@ header h1 {
 .setting { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .setting > label { font-weight: 600; font-size: 1.05rem; }
 
-.threshold-row { display: flex; align-items: center; gap: 14px; }
-.threshold-row input[type="range"] { flex: 1; }
-.threshold-label {
-  min-width: 130px;
-  text-align: right;
-  font-size: 0.95rem;
-  color: var(--muted);
+/* Grenzwert-Stepper mit großen Knöpfen */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #efeaf7;
+  border-radius: 24px;
+  padding: 10px;
+}
+.step-btn {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 22px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.18);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
+}
+.step-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+}
+.step-btn:disabled {
+  opacity: 0.3;
+  box-shadow: none;
+}
+.stepper-value {
+  flex: 1;
+  text-align: center;
+  line-height: 1.15;
+  overflow: hidden;
+}
+.stepper-main {
+  font-size: 2.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #45c46a;
+  transition: color 0.15s ease;
+}
+.stepper-name {
+  font-size: 1.05rem;
   font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 input[type="range"] {

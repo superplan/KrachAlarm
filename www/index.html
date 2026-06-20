@@ -42,10 +42,14 @@
     <!-- Einstellungen -->
     <section class="settings">
       <div class="setting">
-        <label for="threshold">Grenzwert (Alarm ab)</label>
-        <div class="threshold-row">
-          <input type="range" id="threshold" min="20" max="130" step="10" value="80" />
-          <span id="thresholdLabel" class="threshold-label"></span>
+        <label>Alarm ab dieser Lautstärke</label>
+        <div class="stepper">
+          <button id="thrDown" class="step-btn" type="button" aria-label="leiser">−</button>
+          <div class="stepper-value">
+            <div class="stepper-main"><span id="thresholdDb">80</span> dB</div>
+            <div id="thresholdName" class="stepper-name">Föhn</div>
+          </div>
+          <button id="thrUp" class="step-btn" type="button" aria-label="lauter">+</button>
         </div>
       </div>
 
