@@ -12,10 +12,10 @@
     "apk": "cd android && ./gradlew assembleDebug"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.1.2"
+    "@capacitor/cli": "6.1.2"
   },
   "dependencies": {
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/core": "^6.1.2"
+    "@capacitor/android": "6.1.2",
+    "@capacitor/core": "6.1.2"
   }
 }
