@@ -2,18 +2,18 @@
 
 /* ====== Stufen-Tabelle (dB -> Bezeichnung) ====== */
 const STUFEN = [
-  { db: 20, label: "Blätterrascheln" },
-  { db: 30, label: "leises Flüstern" },
-  { db: 40, label: "leiser Regen" },
-  { db: 50, label: "leises Gespräch" },
-  { db: 60, label: "normales Gespräch" },
-  { db: 70, label: "lautes Gespräch" },
-  { db: 80, label: "Föhn" },
-  { db: 90, label: "Rasenmäher" },
-  { db: 100, label: "Kreissäge" },
-  { db: 110, label: "Sirene nah" },
-  { db: 120, label: "Schmerzgrenze" },
-  { db: 130, label: "Düsenjet" },
+  { db: 20, label: "Blätterrascheln", emoji: "🍃" },
+  { db: 30, label: "leises Flüstern", emoji: "🤫" },
+  { db: 40, label: "leiser Regen", emoji: "🌧️" },
+  { db: 50, label: "leises Gespräch", emoji: "💬" },
+  { db: 60, label: "normales Gespräch", emoji: "🗣️" },
+  { db: 70, label: "lautes Gespräch", emoji: "📢" },
+  { db: 80, label: "Föhn", emoji: "💨" },
+  { db: 90, label: "Rasenmäher", emoji: "🚜" },
+  { db: 100, label: "Kreissäge", emoji: "🪚" },
+  { db: 110, label: "Sirene nah", emoji: "🚨" },
+  { db: 120, label: "Schmerzgrenze", emoji: "😖" },
+  { db: 130, label: "Düsenjet", emoji: "✈️" },
 ];
 
 /* ====== Einstellungen speichern/laden ====== */
@@ -80,6 +80,15 @@ function stufeLabel(db) {
   return label;
 }
 
+/* ====== Stufen-Symbol je nach dB ====== */
+function stufeEmoji(db) {
+  let emoji = STUFEN[0].emoji;
+  for (const s of STUFEN) {
+    if (db >= s.db) emoji = s.emoji;
+  }
+  return emoji;
+}
+
 /* ====== Laufzeit-Status ====== */
 let running = false;
 
@@ -102,6 +111,7 @@ const el = {
   thrUp: document.getElementById("thrUp"),
   thresholdDb: document.getElementById("thresholdDb"),
   thresholdName: document.getElementById("thresholdName"),
+  thrKnob: document.getElementById("thrKnob"),
   sound: document.getElementById("sound"),
   testBtn: document.getElementById("testBtn"),
   soundFile: document.getElementById("soundFile"),
@@ -134,6 +144,7 @@ function updateThresholdUI() {
   el.thresholdDb.textContent = v;
   el.thresholdName.textContent = stufeLabel(v);
   el.thresholdDb.parentElement.style.color = color;
+  el.thrKnob.textContent = stufeEmoji(v);
   el.thresholdMark.style.left = `${(v / 130) * 100}%`;
   el.thrDown.disabled = v <= THRESHOLD_MIN;
   el.thrUp.disabled = v >= THRESHOLD_MAX;
