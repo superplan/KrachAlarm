@@ -636,7 +636,10 @@ async function startMeasuring() {
       },
     });
   } catch (e) {
-    setStatus("Mikrofon-Zugriff verweigert oder nicht verfügbar.", true);
+    setStatus(
+      "Mikrofon-Zugriff nicht möglich (" + (e && e.name ? e.name : e) + ")",
+      true
+    );
     return;
   }
 
