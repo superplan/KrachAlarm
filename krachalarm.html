@@ -624,34 +624,40 @@ async function ensureAudioContext() {
   }
 }
 
+// Mikrofon öffnen: erst rohes Signal, sonst kurz warten und Standard versuchen
+async function getMicStream() {
+  const get = (c) => navigator.mediaDevices.getUserMedia(c);
+  try {
+    return await get({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    });
+  } catch (e1) {
+    await new Promise((r) => setTimeout(r, 400));
+    return await get({ audio: true });
+  }
+}
+
 async function startMeasuring() {
   setStatus("");
+  // WICHTIG: erst das Mikrofon öffnen, DANN den AudioContext erstellen.
   try {
-    await ensureAudioContext();
-    try {
-      // Bevorzugt: rohes Signal ohne Bearbeitung (genauere Pegel)
-      micStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-        },
-      });
-    } catch (inner) {
-      // Manche Geräte mögen diese Optionen nicht -> einfacher Standard-Versuch
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    }
+    micStream = await getMicStream();
   } catch (e) {
     const name = e && e.name ? e.name : String(e);
     let msg = "Mikrofon-Zugriff nicht möglich (" + name + ")";
     if (name === "NotReadableError") {
       msg +=
-        " – das Mikrofon ist evtl. von einer anderen App belegt. Schließe andere Apps (Anruf, Sprachrekorder, Assistent), starte das Handy neu und versuch es nochmal.";
+        " – das Mikrofon konnte nicht gestartet werden. Schließe andere Apps (Anruf, Sprachrekorder, Assistent), starte das Handy neu und versuch es nochmal.";
     }
     setStatus(msg, true);
     return;
   }
 
+  await ensureAudioContext();
   const source = audioCtx.createMediaStreamSource(micStream);
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 2048;
