@@ -213,51 +213,64 @@ header h1 {
 }
 .stepper-value {
   flex: 1;
+  min-width: 0; /* erlaubt dem Text zu schrumpfen statt die Knöpfe zu überlagern */
   text-align: center;
   line-height: 1.15;
-  overflow: hidden;
+  padding: 0 4px;
 }
 .stepper-main {
-  font-size: 2.3rem;
+  font-size: 2.2rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: #45c46a;
   transition: color 0.15s ease;
 }
 .stepper-name {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.15;
+  margin-top: 2px;
+  word-break: break-word; /* lange Begriffe brechen um, statt überzulaufen */
 }
 
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  height: 12px;
-  border-radius: 8px;
-  background: #efeaf7;
+  height: 18px;
+  border-radius: 12px;
+  /* bunte Regenbogen-Schiene wie die dB-Skala */
+  background: linear-gradient(
+    90deg,
+    #45c46a 0%,
+    #ffd166 35%,
+    #ff8a3c 60%,
+    #ff5d6c 82%,
+    #9b6bff 100%
+  );
   outline: none;
   touch-action: none; /* damit der Regler am Handy gezogen werden kann */
+  box-shadow: inset 0 2px 4px rgba(90, 60, 160, 0.25);
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px; height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 4px solid #fff;
-  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  /* Knopf mit weißem "Auge" in der Mitte */
+  background: radial-gradient(circle at 50% 38%, #fff 0 38%, var(--accent) 41% 100%);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 8px rgba(90, 60, 160, 0.45);
   cursor: pointer;
 }
 input[type="range"]::-moz-range-thumb {
-  width: 32px; height: 32px;
-  border: 4px solid #fff;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #fff;
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 3px 6px rgba(90,60,160,0.4);
+  background: radial-gradient(circle at 50% 38%, #fff 0 38%, var(--accent) 41% 100%);
+  box-shadow: 0 4px 8px rgba(90, 60, 160, 0.45);
   cursor: pointer;
 }
 
