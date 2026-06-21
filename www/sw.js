@@ -1,4 +1,4 @@
-const CACHE = "krachalarm-v1";
+const CACHE = "krachalarm-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -22,9 +22,19 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+// Netzwerk zuerst: online immer die neueste Version, offline aus dem Cache.
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches
+          .open(CACHE)
+          .then((c) => c.put(e.request, copy))
+          .catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
