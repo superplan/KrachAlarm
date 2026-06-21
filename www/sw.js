@@ -1,4 +1,4 @@
-const CACHE = "krachalarm-v4";
+const CACHE = "krachalarm-v5";
 const ASSETS = [
   "./",
   "./index.html",

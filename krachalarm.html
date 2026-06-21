@@ -28,6 +28,32 @@ html, body {
   background-attachment: fixed;
 }
 
+/* Hintergrund-Foto (verschwommen) + heller Schleier für gute Lesbarkeit.
+   Liegt eine Datei www/img/foto.png vor, wird sie genutzt; sonst bleibt
+   der bunte Verlauf sichtbar. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("img/foto.png") center / cover no-repeat;
+  filter: blur(9px) saturate(1.05);
+  transform: scale(1.12); /* verhindert helle Ränder durch den Blur */
+  z-index: -2;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 226, 154, 0.55),
+    rgba(255, 166, 201, 0.5),
+    rgba(166, 200, 255, 0.5),
+    rgba(184, 166, 255, 0.6)
+  );
+  z-index: -1;
+}
+
 #app {
   max-width: 520px;
   margin: 0 auto;
@@ -107,8 +133,8 @@ header h1 {
   height: 20px;
   background: #efeaf7;
   border-radius: 14px;
-  margin-top: 58px; /* Platz für den Griff oben */
-  overflow: visible; /* Griff darf über den Balken hinausragen */
+  margin-top: 30px;
+  overflow: visible; /* Symbol darf über den Balken hinausragen */
   box-shadow: inset 0 2px 4px rgba(90, 60, 160, 0.12);
   touch-action: none; /* Ziehen statt Scrollen */
   cursor: pointer;
@@ -121,36 +147,33 @@ header h1 {
   background: #45c46a;
   transition: width 0.12s linear, background 0.15s ease;
 }
-/* Grenzwert-Griff: senkrechte Linie + Glöckchen-Knopf zum Ziehen */
+/* Grenzwert-Griff: rundes Stufen-Symbol direkt auf dem Balken (keine Linie) */
 .threshold-mark {
   position: absolute;
-  top: -30px;
-  bottom: -3px;
+  top: 50%;
   left: 60%;
-  width: 5px;
-  margin-left: -2.5px;
-  background: var(--accent);
-  border-radius: 3px;
+  width: 0;
+  height: 0;
   z-index: 3;
 }
 .thr-knob {
   position: absolute;
-  top: -24px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 42px;
-  height: 40px;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 21px;
+  font-size: 24px;
   background: #fff;
   border: 3px solid var(--accent);
-  border-radius: 14px;
-  box-shadow: 0 4px 8px rgba(90, 60, 160, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(90, 60, 160, 0.45);
 }
 .bar-track:active .thr-knob {
-  transform: translateX(-50%) scale(1.12);
+  transform: translate(-50%, -50%) scale(1.12);
 }
 
 /* ===== Start/Stop ===== */

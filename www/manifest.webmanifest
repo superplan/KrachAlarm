@@ -10,6 +10,12 @@
   "theme_color": "#ffb3d1",
   "icons": [
     {
+      "src": "img/foto.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
