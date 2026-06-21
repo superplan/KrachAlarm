@@ -166,6 +166,32 @@ el.thrDown.addEventListener("click", () =>
 el.thrUp.addEventListener("click", () =>
   setThreshold(settings.threshold + THRESHOLD_STEP)
 );
+
+// Grenzwert auch durch Tippen/Ziehen auf dem Balken setzen
+const barTrack = el.thresholdMark.parentElement;
+let draggingThreshold = false;
+function thresholdFromClientX(clientX) {
+  const rect = barTrack.getBoundingClientRect();
+  let frac = (clientX - rect.left) / rect.width;
+  frac = Math.max(0, Math.min(1, frac));
+  setThreshold(Math.round((frac * 130) / THRESHOLD_STEP) * THRESHOLD_STEP);
+}
+barTrack.addEventListener("pointerdown", (e) => {
+  draggingThreshold = true;
+  try {
+    barTrack.setPointerCapture(e.pointerId);
+  } catch (err) {}
+  thresholdFromClientX(e.clientX);
+});
+barTrack.addEventListener("pointermove", (e) => {
+  if (draggingThreshold) thresholdFromClientX(e.clientX);
+});
+barTrack.addEventListener("pointerup", () => {
+  draggingThreshold = false;
+});
+barTrack.addEventListener("pointercancel", () => {
+  draggingThreshold = false;
+});
 el.sound.addEventListener("change", () => {
   settings.sound = el.sound.value;
   updateCustomVisibility();
